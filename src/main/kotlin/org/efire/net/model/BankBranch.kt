@@ -11,30 +11,42 @@ data class BankBranch(val accountIndicator: Int,
 
 
     private val DIGITS_REGEX = "\\d+"
+    private val EXCEPTION_CHECK = -2
 
     fun computeCheckDigit(accountNumber: String) : Int {
 
-        val weightingNumbers = weightingDigitsList()
+        if (isException(modulus)) return EXCEPTION_CHECK
 
-        return 0
+        val weightingNumbers = weightingDigitsList()
+        val accountNumbers = accountNumberDigits(accountNumber)
+        var check: Int = (0..weightingNumbers.size - 1).sumBy { weightingNumbers[it] * accountNumbers[it] }
+
+        check += fudgeFactor
+        return check.rem(modulus)
     }
 
+    fun isException(m: Int?) : Boolean {
+        if (m == null || m === 0) {
+            return true
+        }
+        return false
+    }
     /**
      * Gets the weighting digits list.
      *
      */
-    fun weightingDigitsList() : List<Int>? {
+    fun weightingDigitsList() : List<Int> {
 
-        val wd = weightingDigits.length
-        if (wd.rem(2) == 1)
-            throw IllegalArgumentException("Invalid Weighting Digits length $wd. Length should be an even number.")
+        val wdlen = weightingDigits.length
+        if (wdlen.rem(2) == 1)
+            throw IllegalArgumentException("Invalid Weighting Digits length $wdlen. Length should be an even number.")
 
-        if (DIGITS_REGEX.toRegex().matches(weightingDigits).not())
+        if (isNotDecimalNumber(weightingDigits))
             throw IllegalArgumentException("Invalid Weighting Digits $weightingDigits. Must be numeric.")
 
-        val weightingDigitsNumbers = mutableListOf(wd/2)
+        val weightingDigitsNumbers = mutableListOf(wdlen/2)
         var i = 0
-        while (i <= wd - 2)
+        while (i <= wdlen - 2)
         {
             val x = weightingDigits.substring(i, i + 2).toInt()
             weightingDigitsNumbers.add(x)
@@ -43,4 +55,25 @@ data class BankBranch(val accountIndicator: Int,
         return weightingDigitsNumbers
     }
 
+    fun accountNumberDigits(accountNumber: String) : List<Int>{
+        if (isNotDecimalNumber(accountNumber))
+            throw IllegalArgumentException("Invalid Account Number $accountNumber. Must be numeric.")
+
+        val weightingNumbers = weightingDigitsList()
+        var accountNumbers = accountNumber.toCharArray().map { it.toInt() }
+
+        if (weightingNumbers.size < accountNumbers.size)
+            throw IllegalArgumentException("Invalid Account No. Length should be less than or equal the length of Weighting Digits.")
+
+        while (weightingNumbers.size > accountNumbers.size) {
+            accountNumbers.plus(0).indexOf(0)
+        }
+        return accountNumbers
+    }
+
+    fun isNotDecimalNumber(valString: String) : Boolean {
+        if (DIGITS_REGEX.toRegex().matches(valString).not())
+            return true
+        return false
+    }
 }
