@@ -1,9 +1,6 @@
 package org.efire.net.config
 
-import org.efire.net.exceptions.CdvException
-import org.efire.net.exceptions.ExceptionB
-import org.efire.net.exceptions.ExceptionD
-import org.efire.net.exceptions.ExceptionE
+import org.efire.net.exceptions.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -28,11 +25,18 @@ open class AppConfig {
         return ExceptionE()
     }
 
+    @Bean
+    open fun cdvExceptionF() : CdvException {
+        return ExceptionF()
+    }
+
     @Bean("exceptions")
     open fun exceptions() : MutableMap<String, CdvException> {
-        var exceptions = mutableMapOf("b" to cdvExceptionB(),
+        var exceptions = mutableMapOf(
+                "b" to cdvExceptionB(),
                 "d" to cdvExceptionD(),
-                "e" to cdvExceptionE())
+                "e" to cdvExceptionE(),
+                "f" to cdvExceptionF())
         return exceptions
     }
 }

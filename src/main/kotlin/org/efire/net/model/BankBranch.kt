@@ -34,16 +34,15 @@ data class BankBranch(val accountIndicator: Int = 0,
      */
     fun weightingDigitsList() : List<Int> {
 
-        val wdlen = weightingDigits.length
-        if (wdlen.rem(2) == 1)
-            throw IllegalArgumentException("Invalid Weighting Digits length $wdlen. Length should be an even number.")
+        val wdLength = weightingDigits.length
 
-        if (isNotDecimalNumber(weightingDigits))
-            throw IllegalArgumentException("Invalid Weighting Digits $weightingDigits. Must be numeric.")
+        //Semantic Validation
+        check(wdLength.rem(2) == 0, { "Invalid Weighting Digits length $wdLength. Length should be an even number." })
+        check(isDecimalNumber(weightingDigits), { "Invalid Weighting Digits $weightingDigits. Must be numeric." })
 
-        val weightingDigitsNumbers = mutableListOf(wdlen/2)
+        val weightingDigitsNumbers = mutableListOf(wdLength/2)
         var i = 0
-        while (i <= wdlen - 2)
+        while (i <= wdLength - 2)
         {
             val x = weightingDigits.substring(i, i + 2).toInt()
             weightingDigitsNumbers.add(x)
@@ -53,15 +52,14 @@ data class BankBranch(val accountIndicator: Int = 0,
     }
 
     fun accountNumberDigits(accountNumber: String) : List<Int>{
-        if (isNotDecimalNumber(accountNumber))
-            throw IllegalArgumentException("Invalid Account Number $accountNumber. Must be numeric.")
+        require(isDecimalNumber(accountNumber), { "Invalid Account Number $accountNumber. Must be numeric." } )
 
         val weightingNumbers = weightingDigitsList()
         var accountNumbers = arrayListOf<Int>()
         accountNumber.toCharArray().mapTo(accountNumbers) { it.toInt() }
 
-        if (weightingNumbers.size < accountNumbers.size)
-            throw IllegalArgumentException("Invalid Account No. Length should be less than or equal the length of Weighting Digits.")
+        check(accountNumbers.size < weightingNumbers.size,
+                { "Invalid Account No. Length should be less than or equal the length of Weighting Digits." })
 
         while (weightingNumbers.size > accountNumbers.size) {
             accountNumbers.add(0, 0)
@@ -69,8 +67,8 @@ data class BankBranch(val accountIndicator: Int = 0,
         return accountNumbers
     }
 
-    fun isNotDecimalNumber(valString: String) : Boolean {
-        if (DIGITS_REGEX.toRegex().matches(valString).not())
+    fun isDecimalNumber(valString: String) : Boolean {
+        if (DIGITS_REGEX.toRegex().matches(valString))
             return true
         return false
     }

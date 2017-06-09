@@ -19,7 +19,7 @@ class CdvController {
     @Qualifier("exceptions")
     lateinit var exception: Map<String, CdvException>
 
-    private var LOG : Logger = LoggerFactory.getLogger(javaClass)
+    private val LOG : Logger = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/{accountNumber}/{exceptionCode}/verify")
     fun verifyByException(@PathVariable accountNumber: String,
@@ -27,7 +27,9 @@ class CdvController {
                           @RequestBody bankBranch: BankBranch) {
 
         val result = exception[exceptionCode]?.check(accountNumber, bankBranch)
-        //TODO : Return a Response Entity
+        // TODO  Return a Response Entity
         LOG.info("Result: $result")
     }
 }
+
+

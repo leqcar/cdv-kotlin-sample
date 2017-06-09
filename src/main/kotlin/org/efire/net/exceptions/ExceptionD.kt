@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory
  * Created by DELFIN.TENERIFE on 6/9/2017.
  */
 class ExceptionD : CdvException{
-    private var LOG : Logger = LoggerFactory.getLogger(javaClass)
+    private val LOG : Logger = LoggerFactory.getLogger(javaClass)
 
     override fun check(accountNumber: String, bankBranch: BankBranch): Boolean {
         LOG.info("Validating...")
         val check = bankBranch.computeCheckDigit(accountNumber)
-        return 0 === check || checkDigitLen(check, accountNumber)
+        return 0 == check || checkDigitLen(check, accountNumber)
     }
 
     private fun checkDigitLen(check: Int, accountNumber: String): Boolean {
@@ -21,7 +21,7 @@ class ExceptionD : CdvException{
     }
 
     override fun isValidAccount(accountNumber: String): Boolean {
-        var len: Int = accountNumber.length
+        val len: Int = accountNumber.length
         return 11 == len && ('1' == accountNumber.codePointAt(len - 1).toChar() || '0' == accountNumber.codePointAt(len - 1).toChar())
                 || '0' == accountNumber.codePointAt(0).toChar()
     }
