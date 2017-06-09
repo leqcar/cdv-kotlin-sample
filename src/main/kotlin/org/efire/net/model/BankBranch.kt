@@ -4,10 +4,10 @@ package org.efire.net.model
  * Created by jongtenerife on 08/06/2017.
  */
 
-data class BankBranch(val accountIndicator: Int,
-                      val weightingDigits: String,
-                      val fudgeFactor: Int,
-                      val modulus: Int) {
+data class BankBranch(val accountIndicator: Int = 0,
+                      val weightingDigits: String = "",
+                      val fudgeFactor: Int = 0,
+                      val modulus: Int = 0) {
 
 
     private val DIGITS_REGEX = "\\d+"
@@ -26,10 +26,7 @@ data class BankBranch(val accountIndicator: Int,
     }
 
     fun isException(m: Int?) : Boolean {
-        if (m == null || m === 0) {
-            return true
-        }
-        return false
+        return when(m) { null, 0 -> true else -> false }
     }
     /**
      * Gets the weighting digits list.
@@ -60,13 +57,14 @@ data class BankBranch(val accountIndicator: Int,
             throw IllegalArgumentException("Invalid Account Number $accountNumber. Must be numeric.")
 
         val weightingNumbers = weightingDigitsList()
-        var accountNumbers = accountNumber.toCharArray().map { it.toInt() }
+        var accountNumbers = arrayListOf<Int>()
+        accountNumber.toCharArray().mapTo(accountNumbers) { it.toInt() }
 
         if (weightingNumbers.size < accountNumbers.size)
             throw IllegalArgumentException("Invalid Account No. Length should be less than or equal the length of Weighting Digits.")
 
         while (weightingNumbers.size > accountNumbers.size) {
-            accountNumbers.plus(0).indexOf(0)
+            accountNumbers.add(0, 0)
         }
         return accountNumbers
     }
